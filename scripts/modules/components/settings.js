@@ -108,7 +108,7 @@ export function initSettings() {
 
   // -- Boton de acerca de 
   aboutMeBtn.addEventListener("click", () => {
-    const version = localStorage.getItem("appVersion") || "0.0.0";
+    const version = localStorage.getItem("AppVersion") || "0.0.0";
     showModal({
       title: `
       <div text-align: center; display: flex; align-item: center; justify-content: center; gap:4px;>
@@ -117,7 +117,6 @@ export function initSettings() {
       </div>
       `,
       message: `
-          <p>Versión: <strong>${version}</strong></p>
           <p style="margin-top: 10px; font-size: 0.9em; opacity: 0.8;">
             © 2026 Hector Lerma. Todos los derechos reservados.
           </p>
@@ -185,6 +184,7 @@ export function initSettings() {
 
   state.playMode = getStoredMode();
   syncModeIcon();
+
 
   // --- Respaldo: Dropdown custom ---
   const backupRow = document.getElementById("backup-row");
@@ -292,15 +292,9 @@ export function initSettings() {
 
   // --- SELECCIÓN DE ESTILO DE BARRA DE TÍTULO ---
   if (titlebarRow && titlebarDropdown) {
-    const esDesarrollo =
-      window.location.hostname === "localhost" ||
-      window.location.hostname === "127.0.0.1";
-
-    // 🚀 CORREGIDO: Detección nativa del motor WebView2 (.NET)
-    const esAppNativa = window.chrome?.webview !== undefined;
-
-    // Si no estamos en web local ni corriendo en el cascarón de Windows, se oculta la fila
-    if (!esDesarrollo && !esAppNativa) {
+    const isNative = window.chrome?.webview !== undefined;
+    
+    if (!isNative) {
       titlebarRow.style.display = "none";
     }
 

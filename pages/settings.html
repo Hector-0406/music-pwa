@@ -1,8 +1,8 @@
 <!-- SETTINGS -->
 <section id="settings_section" style="display: none;">
-
   <!-- OVERLAY -->
   <div class="settings-overlay" id="settings-overlay"></div>
+
   <!-- SETTINGS ASIDE -->
   <aside class="settings-panel" id="settings-panel" aria-label="Ajustes">
     <div class="settings-panel__header">
@@ -16,7 +16,6 @@
     </div>
 
     <div class="settings-panel__body">
-
       <!-- Reproducción -->
       <div class="settings-group">
         <div class="settings-group__label">Reproducción</div>
@@ -57,12 +56,10 @@
             <div class="settings-row__label">Ecualizador</div>
             <div class="settings-row__desc">Ajustar frecuencias de audio</div>
           </div>
-          <span class="settings-row__arrow">
-            <l-icon name="chevron-down"></l-icon>
-          </span>
         </div>
 
       </div>
+
       <div class="settings-divider"></div>
 
       <!-- Apariencia -->
@@ -77,7 +74,7 @@
             <div class="settings-row__label">Tema oscuro</div>
             <div class="settings-row__desc">Cambiar entre claro y oscuro</div>
           </div>
-          <label class="settings-toggle">
+          <label class="settings-toggle" name="toggle-theme">
             <input type="checkbox" id="toggle-theme" checked>
             <span class="settings-toggle__track"></span>
           </label>
@@ -85,26 +82,31 @@
 
         <div class="settings-row titlebar-style-row" id="setting-titlebar-style">
           <div class="settings-row__icon">
-            <l-icon name="desktop-outline"></l-icon>
+            <l-icon name="color-palette"></l-icon>
           </div>
           <div class="settings-row__text">
-            <div class="settings-row__label">Estilo de ventana</div>
-            <div class="settings-row__desc">Adaptar controles al sistema operativo</div>
+            <h2 class="settings-row__label">Estilos de Barra</h2>
+            <p class="settings-row__desc">Elige el estilo visual de la barra de titulo.</p>
           </div>
-          <span class="settings-row__arrow titlebar-style-arrow" id="titlebar-style-arrow">
-            <l-icon name="chevron-down"></l-icon>
-          </span>
 
-          <div class="titlebar-style-dropdown" id="titlebar-style-dropdown" aria-hidden="true">
-            <button class="titlebar-style-option" data-style="custom">
-              Custom
+          <div role="menu" aria-label="Estilos de barra de título"
+            class="titlebar-style-dropdown" id="titlebar-style-dropdown" >
+            <button role="menuitem" class="titlebar-style-option" data-style="custom">
+              <l-icon name="color-wand" aria-hidden="true"></l-icon> Custom
             </button>
-            <button class="titlebar-style-option" data-style="native">
-              Native
+            <button role="menuitem" class="titlebar-style-option" data-style="macos">
+              <l-icon name="logo-apple" aria-hidden="true"></l-icon> MacOS
+            </button>
+            <button role="menuitem" class="titlebar-style-option" data-style="linux">
+              <l-icon name="logo-tux" aria-hidden="true"></l-icon>&nbsp;Linux&nbsp;
+            </button>
+            <button role="menuitem" class="titlebar-style-option" data-style="native">
+              <l-icon name="hardware-chip" aria-hidden="true"></l-icon> Nativo
             </button>
           </div>
         </div>
       </div>
+
       <div class="settings-divider"></div>
 
       <!-- Biblioteca -->
@@ -121,12 +123,14 @@
           </div>
         </div>
       </div>
+
       <div class="settings-divider"></div>
 
       <!-- General -->
       <div class="settings-group">
         <div class="settings-group__label">General</div>
 
+        <!-- Respaldos -->
         <div class="settings-row backup-row" id="backup-row">
           <div class="settings-row__icon">
             <l-icon name="save"></l-icon>
@@ -135,7 +139,7 @@
             <div class="settings-row__label">Respaldo</div>
             <div class="settings-row__desc">Exportar o importar datos</div>
           </div>
-          <span class="settings-row__arrow backup-arrow" id="backup-arrow">
+          <span class="settings-row__arrow backup-arrow" id="backup-arrow" >
             <l-icon name="chevron-down"></l-icon>
           </span>
 
@@ -153,6 +157,7 @@
         </div>
         <input type="file" id="import-file-input" accept=".json" hidden>
 
+        <!-- Borrar -->
         <div class="settings-row">
           <div class="settings-row__icon">
             <l-icon name="trash"></l-icon>
@@ -163,19 +168,27 @@
           </div>
         </div>
 
+        <!-- Mi Portal -->
+        <div class="settings-row" onclick="window.open('https://lerma-dev.vercel.app', '_blank')">
+          <div class="settings-row__icon">
+            <l-icon name="globe-outline"></l-icon>
+          </div>
+          <div class="settings-row__text">
+            <div class="settings-row__label">Mi Portal</div>
+            <div class="settings-row__desc">Conoce más sobre mis proyectos</div>
+          </div>
+        </div>
+
+        <!-- Acerca de -->
         <div class="settings-row">
           <div class="settings-row__icon">
             <l-icon name="info"></l-icon>
           </div>
           <div class="settings-row__text" id="btn_settings_aboutMe">
             <div class="settings-row__label">Acerca de</div>
-            <div class="settings-row__desc">Versión y licencias</div>
+            <div class="settings-row__desc">Versiónes y licencias</div>
           </div>
-          <span class="settings-row__arrow">
-            <l-icon name="chevron-down"></l-icon>
-          </span>
         </div>
-
       </div>
     </div>
 

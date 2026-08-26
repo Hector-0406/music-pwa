@@ -1,6 +1,5 @@
 // app/sw.js
-const CACHE_NAME = "music-v2.0.0";
-const APP_VERSION = CACHE_NAME.replace("music-v", "");
+const CACHE_NAME = "v2.0.1";
 const SHARE_DB_NAME = "MusicAppDB";
 const SHARE_STORE_NAME = "library_meta";
 
@@ -9,8 +8,7 @@ const ASSETS = [
   "./index.html",
   "./styles/main.css",
   "./scripts/app.js",
-  "./scripts/icons.js",
-  "./assets/lerma-icons/help.svg",
+  "./scripts/icons.js", 
   "./manifest.json",
 ];
 
@@ -40,14 +38,6 @@ self.addEventListener("activate", (e) => {
           type: "window",
         });
       })
-      .then((clients) => {
-        clients.forEach((client) =>
-          client.postMessage({
-            action: "setVersion",
-            version: APP_VERSION,
-          }),
-        );
-      }),
   );
   return self.clients.claim();
 });
@@ -60,27 +50,6 @@ self.addEventListener("fetch", (e) => {
     e.respondWith(handleShareTarget(e.request));
     return;
   }
-
-  // EXCEPCIÓN: No cachear nunca el archivo de verificación de Google
-  if (e.request.url.includes('.well-known/assetlinks.json')) {
-    return; // Esto hace que el navegador use la red directamente
-  }
-  e.respondWith(
-    caches.match(e.request).then((res) => {
-      return (
-        res ||
-        fetch(e.request).then((newRes) => {
-          // cachear si la respuesta es válida
-          if (!newRes || newRes.status !== 200) return newRes;
-
-          return caches.open(CACHE_NAME).then((cache) => {
-            cache.put(e.request, newRes.clone());
-            return newRes;
-          });
-        })
-      );
-    }),
-  );
 });
 
 async function handleShareTarget(request) {

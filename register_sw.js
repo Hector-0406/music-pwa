@@ -1,9 +1,6 @@
 // app/register_sw.js
 const hostname = window.location.hostname;
-const isLocal =
-  hostname === "music.test" ||
-  hostname === "localhost" ||
-  hostname === "127.0.0.1";
+const isLocal = hostname === "localhost" || hostname === "127.0.0.1";
 if (isLocal) {
   console.info("Service Worker: Desactivado en entorno local.");
 } else if ("serviceWorker" in navigator) {
@@ -13,17 +10,6 @@ if (isLocal) {
     if (reg.active && !localStorage.getItem("appVersion")) {
       // Forzamos el envío de la versión desde el SW
       reg.active.postMessage({ action: "requestVersion" });
-    }
-  });
-
-  // Mensaje para actualizar version en el DOM mediante localStorage
-  navigator.serviceWorker.addEventListener("message", (event) => {
-    if (event.data?.action === "setVersion") {
-      localStorage.setItem("appVersion", event.data.version);
-      // Opcional: Disparar un evento personalizado para avisar a settings.js
-      window.dispatchEvent(
-        new CustomEvent("versionUpdated", { detail: event.data.version }),
-      );
     }
   });
 
