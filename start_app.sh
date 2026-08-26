@@ -1,5 +1,4 @@
 #!/bin/bash
-# Configuración de colores (Estilo Ubuntu/ANSI)
 BLUE='\033[01;34m'
 GREEN='\033[01;32m'
 YELLOW='\033[01;33m'
@@ -8,13 +7,8 @@ RESET='\033[0m'
 
 echo -e "==== Iniciando servidor ===="
 
-if ! netstat -ano 2>/dev/null | grep -q ":80 " >/dev/null 2>&1; then
-    PUERTO=80
-    URL="http://localhost"
-else
-    PUERTO=3300
-    URL="http://localhost:3300"
-fi
+PUERTO=3300
+URL="http://localhost:3300"
 
 # Esperar unos segundos para asegurar que esté listo
 sleep 5

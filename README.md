@@ -113,17 +113,17 @@ chmod +x start_app.sh
 **En windows**
 
 ```bash
-py -m http.server 80 --directory app
+py -m http.server 3300 --directory app
 ```
 
 **En Mac/linux**
 
 ```bash
-python3 -m http.server 80 --directory app
+python3 -m http.server 3300 --directory app
 ```
 
 ### 4. Accede a la App:
 
-Abre tu navegador en http://localhost.
+Abre tu navegador en http://localhost:3300.
 
-> **Nota:** Los script `.bat` y `.sh` detectarán automáticamente si el puerto 80 está ocupado y, de ser así, lanzará la app en http://localhost:3300.
+> **Nota:** Los scripts `.bat` y `.sh` lanzarán la aplicación directamente en http://localhost:3300. Los logs del servidor se guardan automáticamente en un archivo `server.log`; si prefieres ver la salida en tiempo real en la terminal, puedes ejecutar el comando manualmente.
