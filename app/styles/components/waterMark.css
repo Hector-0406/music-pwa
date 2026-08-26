@@ -15,6 +15,11 @@
   z-index: 1000;
 }
 
+html.native-app .waterMark{
+  max-height: calc(100vh - 32px - 40px);
+  overflow: hidden;
+}
+
 body:has(.settings-panel.is-open) .waterMark {
   opacity: 0;
   pointer-events: none;

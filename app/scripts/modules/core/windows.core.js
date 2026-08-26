@@ -5,6 +5,7 @@ let isMaximized = false;
 let clickInBar = false;
 let isDragging = false;
 let isMouseDown = false;
+let isMenuOpen = false;
 let dragSent = false;
 let startX, startY;
 
@@ -18,12 +19,23 @@ function sendCommand(accion) {
   }
 }
 
+
 function renderTitleBar() {
   titlebar = document.getElementById("desktop-titlebar");
   if (!titlebar) return;
+  const isLinux = titlebar.classList.contains("linux");
+
+  let iconClose = "close";
+  let iconMinimize = "chevron-down";
+  let iconMaximize = isMaximized ? "restore" : "maximize";
+
+  if (isLinux) {
+    iconClose = "close-native";
+    iconMinimize = "minimize-native";
+    iconMaximize = isMaximized ? "restore-native" : "maximize-native";
+  }
 
   const actionText = isMaximized ? "Restore" : "Maximize";
-  const iconName = isMaximized ? "restore" : "maximize";
 
   titlebar.innerHTML = `
   <div class="title-container">
@@ -36,13 +48,13 @@ function renderTitleBar() {
     </button>
     <div class="line"></div>
     <button onclick="window.sendCommand('minimize')" class="ctrl-btn btn-minimize" title="Minimize">
-      <l-icon name="chevron-down"></l-icon>
+      <l-icon name="${iconMinimize}"></l-icon>
     </button>
     <button onclick="toggleMaximize()" class="ctrl-btn btn-maximize" title="${actionText}">
-      <l-icon name="${iconName}"></l-icon>
+      <l-icon name="${iconMaximize}"></l-icon>
     </button>
     <button onclick="window.sendCommand('close')" class="ctrl-btn btn-close" title="Close">
-      <l-icon name="close"></l-icon>
+      <l-icon name="${iconClose}"></l-icon>
     </button>
   </div>
   `;
@@ -83,12 +95,14 @@ export function initTitlebar() {
     // Si estamos arrastrando, no cerramos
     if (isDragging) return;
 
-    if (window.chrome?.webview?.postMessage) {
+    // Solo enviamos si el menú está abierto
+    if (isMenuOpen && window.chrome?.webview?.postMessage) {
       sendCommand("close_menu");
+      isMenuOpen = false; // Reseteamos el estado
     }
   });
   if (titlebar) {
-    titlebar.classList.remove("custom", "native");
+    titlebar.classList.remove("custom", "macos", "linux", "native");
     titlebar.addEventListener("mousedown", (e) => {
       if (e.target.closest(".ctrl-btn") || e.target.closest(".logo-titlebar"))
         return;
@@ -126,6 +140,7 @@ export function initTitlebar() {
       e.preventDefault();
 
       if (window.chrome?.webview?.postMessage) {
+        isMenuOpen = true; // Marcamos que el menú se abrió
         const payload = JSON.stringify({
           action: "show_system_menu",
           screenX: e.screenX,
@@ -138,10 +153,6 @@ export function initTitlebar() {
 
   // Detectamos si estamos dentro del WebView2 de Microsoft
   if (window.chrome?.webview) {
-    // Marca <html> (igual que el script inline en index.html) para que el CSS
-    // de la barra de título custom (desktop-titlebar.css) solo se aplique
-    // aquí, no en navegador/PWA. classList.add es idempotente si ya se
-    // agregó desde el script inline.
     document.documentElement.classList.add("native-app");
 
     window.modeDesktopActive = () => {
@@ -178,11 +189,6 @@ export function initTitlebar() {
   }
 }
 
-function actualizarModoUI(isCustom) {
-  const root = document.getElementById("footer-settings");
-  root.classList.toggle("is-custom-bar", isCustom);
-}
-
 export function aplicarDiseñoCompleto(estilo) {
   if (!titlebar) {
     titlebar = document.getElementById("desktop-titlebar");
@@ -194,7 +200,8 @@ export function aplicarDiseñoCompleto(estilo) {
   const settingBtn = document.getElementById("settings-btn");
 
   if (estilo === "native") {
-    titlebar.classList.remove("custom", "native");
+    document.documentElement.classList.remove("native-app");
+    titlebar.classList.remove("custom", "macos", "linux", "native");
     titlebar.style.display = "none";
 
     if (sidebarBottom) {
@@ -205,13 +212,11 @@ export function aplicarDiseñoCompleto(estilo) {
     }
 
     sendCommand("native_bar");
-    actualizarModoUI(false);
     return;
   }
 
   sendCommand("custom_bar");
-  actualizarModoUI(true);
-
+  document.documentElement.classList.add("native-app");
   titlebar.style.display = "flex";
   if (sidebarBottom) {
     sidebarBottom.style.display = "none";
@@ -221,6 +226,7 @@ export function aplicarDiseñoCompleto(estilo) {
     settingBtn.style.display = "none";
   }
 
-  titlebar.classList.remove("custom", "native");
+  titlebar.classList.remove("custom", "macos", "linux", "native");
   titlebar.classList.add(estilo);
+  renderTitleBar();
 }
