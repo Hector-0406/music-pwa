@@ -1,4 +1,3 @@
-// app/scripts/modules/components/all-songs.js
 import { state } from "../utils/state.js";
 import { escapeJS, applyMarqueeIfNeeded } from "../utils/helpers.js";
 import { playSong } from "./player.js";
@@ -20,45 +19,65 @@ export function initAllSongs() {
   });
 }
 
-// Vuelve a pintar la lista de "Canciones" solo si ya fue inicializada,
-// útil para mantenerla sincronizada tras favoritos/edición/borrado.
+// Vuelve a pintar la lista de "Canciones" manteniendo el estado del input actual
 export function refreshAllSongsView() {
   if (!allSongsListUI) return;
-  renderAllSongs(currentSearchTerm);
+  const term = allSongsSearch ? allSongsSearch.value : currentSearchTerm;
+  renderAllSongs(term);
 }
 
-export function renderAllSongs(searchTerm = "") {
-  currentSearchTerm = searchTerm;
+export function renderAllSongs(searchTerm = null) {
+  // Sincronizamos currentSearchTerm prioritariamente con la caja de texto
+  if (searchTerm !== null) {
+    currentSearchTerm = searchTerm;
+  } else if (allSongsSearch) {
+    currentSearchTerm = allSongsSearch.value;
+  }
+
   allSongsListUI.innerHTML = "";
 
-  // 1. Aplanamos todas las canciones de todas las carpetas en una sola lista
-  let allSongs = [];
+  // 1. Aplanamos todas las canciones de la biblioteca
+  let fullList = [];
   for (const folder in state.library) {
     state.library[folder].forEach((song) => {
-      allSongs.push({ ...song, folderName: folder });
+      fullList.push({ ...song, folderName: folder });
     });
   }
 
   // 2. Filtramos por término de búsqueda si existe
-  if (searchTerm) {
-    allSongs = allSongs.filter(
+  let filteredSongs = fullList;
+  const cleanTerm = currentSearchTerm.trim().toLowerCase();
+
+  if (cleanTerm !== "") {
+    filteredSongs = fullList.filter(
       (s) =>
-        s.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        s.artist.toLowerCase().includes(searchTerm.toLowerCase()),
+        s.title.toLowerCase().includes(cleanTerm) ||
+        s.artist.toLowerCase().includes(cleanTerm),
     );
+  } else {
+    // Si el buscador se limpió, sincronizamos la cola activa si estamos en la vista de todas las canciones
+    if (state.currentQueue.length !== fullList.length && fullList.length > 0) {
+      const activeSong = state.currentQueue[state.currentIndex];
+      state.currentQueue = fullList;
+      if (activeSong) {
+        state.currentIndex = fullList.findIndex(
+          (s) => s.title === activeSong.title && s.folderName === activeSong.folderName
+        );
+      }
+    }
   }
 
-  currentAllSongs = allSongs;
+  currentAllSongs = filteredSongs;
 
-  // 3. Actualizamos stats
+  // 3. Actualizamos los stats en pantalla
   document.getElementById("all-songs-stats-info").textContent =
-    `${allSongs.length} canciones`;
+    `${filteredSongs.length} canciones`;
 
   const currentSong = state.currentQueue[state.currentIndex];
   const fragment = document.createDocumentFragment();
   const newTitles = [];
 
-  allSongs.forEach((song) => {
+  filteredSongs.forEach((song) => {
     const isPlaying =
       state.currentIndex !== -1 &&
       currentSong?.title === song.title &&
@@ -85,9 +104,9 @@ export function renderAllSongs(searchTerm = "") {
             : `<l-icon name="musical-note"></l-icon>`
         }
       </div>
-      <div class="marquee-container" style="overflow:hidden; flex:1;">
+      <div class="marquee-container">
         <strong class="marquee-text">${song.title}</strong>
-        <span class="song-artist" style="display:block; font-size:0.8em; opacity:0.5;">${song.artist}</span>
+        <span class="song-artist">${song.artist}</span>
       </div>
     </div>
     <button class="fav-btn" onclick="toggleFavorite('${escapedFolder}', '${escapedTitle}', event)">
@@ -97,7 +116,7 @@ export function renderAllSongs(searchTerm = "") {
       <l-icon name="menu"></l-icon>
     </button>`;
 
-    // Lógica de visualizador
+    // Lógica de visualizador si se está reproduciendo
     if (isPlaying) {
       requestAnimationFrame(() => {
         const miniCanvas = li.querySelector(".mini-viz");
@@ -105,16 +124,16 @@ export function renderAllSongs(searchTerm = "") {
       });
     }
 
-    // Al hacer clic, cargamos todo el array plano (ya filtrado) en la cola
+    // Al hacer clic, cargamos el conjunto visible actual en la cola
     li.querySelector(".song-info-container").onclick = () => {
-      state.currentQueue = allSongs;
-      const index = allSongs.findIndex(
+      state.currentQueue = filteredSongs;
+      const index = filteredSongs.findIndex(
         (s) => s.title === song.title && s.folderName === song.folderName,
       );
       playSong(index);
     };
 
-    // Menú contextual (editar / eliminar / agregar a playlist)
+    // Menú contextual
     li.querySelector(".song-ctx-btn").addEventListener("click", (e) => {
       openSongContextMenu(e, song, "detail", {
         folderName: song.folderName,
