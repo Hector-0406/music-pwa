@@ -8,8 +8,8 @@ const KEYS = {
   LAST_VERSION: 'music_last_known_version',
 };
 
-const APP_NAME    = 'Music';
-const APP_VERSION = localStorage.getItem('appVersion') ?? '0.0.0';
+const APP_NAME    = 'L-Tunes';
+const APP_VERSION = localStorage.getItem('AppVersion') ?? '0.0.0';
 const DAYS_LIMIT  = 15;
 
 // ─── Comparación de fechas ────────────────────────────────────────────────────
@@ -68,7 +68,7 @@ export async function exportBackup() {
 
     const now      = new Date();
     const dateStr  = now.toISOString().slice(0, 10);
-    const fileName = `Music_Backup_${dateStr}_${totalSongs}songs.json`;
+    const fileName = `LTunes_Backup_${dateStr}_${totalSongs}songs.json`;
 
     const payload = {
       _meta: {
