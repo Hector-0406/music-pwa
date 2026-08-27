@@ -5,13 +5,8 @@ function toggleBannerVisibility() {
   const banner = document.getElementById("banner-desktop");
   if (!banner) return;
 
-  const isDesktop =
-    window.matchMedia("(min-width: 1024px)").matches &&
-    !("ontouchstart" in window);
-  const isMobile = window.matchMedia(
-    "(min-width: 320px) and (max-width: 768px)",
-  ).matches;
-  const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
+  const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+  const isWebView = window.chrome?.webview;
 
   const closedTime = parseInt(localStorage.getItem("banner-closed"));
   const unDiaEnMs = 24 * 60 * 60 * 1000;
@@ -20,8 +15,8 @@ function toggleBannerVisibility() {
     return;
   }
 
-  // Si no cumple las condiciones, ocultar
-  if (!isDesktop || isMobile || isStandalone || window.chrome?.webview) {
+  /// Ocultar si es pantalla pequeña o si está dentro de WebView2
+  if (!isDesktop || isWebView) {
     banner.style.display = "none";
   } else {
     // Si es desktop y no ha sido cerrado, mostrar
